@@ -70,6 +70,10 @@ Use the returned token as `Authorization: Bearer {token}` for `/api/v1/products`
 
 See [`docs/architecture.md`](docs/architecture.md) for module boundaries, data flow, and deployment notes.
 
+## Live demo
+
+**URL:** _Pending deployment_ — [GitHub](https://github.com/koro-manoj/koro-platform)
+
 ## License
 
 MIT
