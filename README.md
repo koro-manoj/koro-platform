@@ -59,22 +59,9 @@ curl -X POST http://localhost:8080/api/v1/auth/login \
 
 Use the returned token as `Authorization: Bearer {token}` for `/api/v1/products`, `/invoices`, `/contacts`, `/pages`, `/inventory`.
 
-## Git workflow
-
-- `main` — stable releases
-- `dev` — integration branch
-- `feature/*` — module work (e.g. `feature/payments-webhooks`)
-- [Conventional Commits](https://www.conventionalcommits.org/) — `feat(ecommerce): add cart checkout`
-
-## Documentation
-
-See [`docs/architecture.md`](docs/architecture.md) for module boundaries and data flow.
-
-See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for the Docker-first production checklist.
-
 ## Live demo
 
-**URL:** _Pending deployment_ — [GitHub](https://github.com/koro-manoj/koro-platform)
+Pending deployment.
 
 ## License
 
