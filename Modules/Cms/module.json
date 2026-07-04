@@ -1,0 +1,12 @@
+{
+    "name": "Cms",
+    "alias": "cms",
+    "description": "Pages and media library.",
+    "keywords": ["cms", "pages", "media"],
+    "priority": 4,
+    "providers": [
+        "Modules\\Cms\\Providers\\CmsServiceProvider",
+        "Modules\\Cms\\Providers\\Filament\\CmsPanelProvider"
+    ],
+    "files": []
+}

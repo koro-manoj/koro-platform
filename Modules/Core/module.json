@@ -1,0 +1,12 @@
+{
+    "name": "Core",
+    "alias": "core",
+    "description": "Authentication, settings, and encrypted integration credentials.",
+    "keywords": ["auth", "settings", "integrations"],
+    "priority": 0,
+    "providers": [
+        "Modules\\Core\\Providers\\CoreServiceProvider",
+        "Modules\\Core\\Providers\\Filament\\CorePanelProvider"
+    ],
+    "files": []
+}

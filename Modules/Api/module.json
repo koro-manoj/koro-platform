@@ -1,0 +1,11 @@
+{
+    "name": "Api",
+    "alias": "api",
+    "description": "Sanctum REST API for platform resources.",
+    "keywords": ["api", "sanctum", "rest"],
+    "priority": 6,
+    "providers": [
+        "Modules\\Api\\Providers\\ApiServiceProvider"
+    ],
+    "files": []
+}

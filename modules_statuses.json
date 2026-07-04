@@ -1,0 +1,9 @@
+{
+    "Core": true,
+    "Payments": true,
+    "Ecommerce": true,
+    "Crm": true,
+    "Cms": true,
+    "Erp": true,
+    "Api": true
+}

@@ -1,0 +1,12 @@
+{
+    "name": "Crm",
+    "alias": "crm",
+    "description": "Contacts, leads, and sales pipeline.",
+    "keywords": ["crm", "leads", "pipeline"],
+    "priority": 3,
+    "providers": [
+        "Modules\\Crm\\Providers\\CrmServiceProvider",
+        "Modules\\Crm\\Providers\\Filament\\CrmPanelProvider"
+    ],
+    "files": []
+}

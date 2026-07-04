@@ -1,0 +1,12 @@
+{
+    "name": "Ecommerce",
+    "alias": "ecommerce",
+    "description": "Products, cart, and checkout storefront.",
+    "keywords": ["ecommerce", "shop", "cart"],
+    "priority": 2,
+    "providers": [
+        "Modules\\Ecommerce\\Providers\\EcommerceServiceProvider",
+        "Modules\\Ecommerce\\Providers\\Filament\\EcommercePanelProvider"
+    ],
+    "files": []
+}

@@ -1,0 +1,12 @@
+{
+    "name": "Erp",
+    "alias": "erp",
+    "description": "Inventory and lightweight order management.",
+    "keywords": ["erp", "inventory", "orders"],
+    "priority": 5,
+    "providers": [
+        "Modules\\Erp\\Providers\\ErpServiceProvider",
+        "Modules\\Erp\\Providers\\Filament\\ErpPanelProvider"
+    ],
+    "files": []
+}
