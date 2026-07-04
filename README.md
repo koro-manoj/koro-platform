@@ -68,7 +68,9 @@ Use the returned token as `Authorization: Bearer {token}` for `/api/v1/products`
 
 ## Documentation
 
-See [`docs/architecture.md`](docs/architecture.md) for module boundaries, data flow, and deployment notes.
+See [`docs/architecture.md`](docs/architecture.md) for module boundaries and data flow.
+
+See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for the Docker-first production checklist.
 
 ## Live demo
 

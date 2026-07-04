@@ -3,42 +3,51 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Koro Platform — modular Laravel monolith with Core, Payments, Ecommerce, CRM, CMS, ERP, and REST API.">
     <title>@yield('title', config('app.name'))</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=syne:600,700,800|dm-sans:400,500,600,700" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <style>
-        :root { --koro-bg: #0b1020; --koro-card: #121933; --koro-accent: #7c6cff; --koro-text: #eef2ff; }
-        body { font-family: 'Instrument Sans', system-ui, sans-serif; background: radial-gradient(circle at top, #1a2454, var(--koro-bg)); color: var(--koro-text); min-height: 100vh; }
-        .container { max-width: 1120px; margin: 0 auto; padding: 1.5rem; }
-        .nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0 2rem; }
-        .nav a { color: var(--koro-text); text-decoration: none; opacity: .85; margin-left: 1rem; }
-        .nav a:hover { opacity: 1; color: #fff; }
-        .brand { font-weight: 700; font-size: 1.25rem; letter-spacing: -.02em; }
-        .card { background: color-mix(in srgb, var(--koro-card) 90%, white 5%); border: 1px solid rgba(255,255,255,.08); border-radius: 1rem; padding: 1.25rem; }
-        .btn { display: inline-flex; align-items: center; gap: .5rem; background: var(--koro-accent); color: white; border: 0; border-radius: .75rem; padding: .75rem 1rem; font-weight: 600; text-decoration: none; cursor: pointer; }
-        .btn-secondary { background: transparent; border: 1px solid rgba(255,255,255,.2); }
-        .grid { display: grid; gap: 1rem; }
-        @media (min-width: 768px) { .grid-3 { grid-template-columns: repeat(3, 1fr); } .grid-4 { grid-template-columns: repeat(4, 1fr); } }
-        .muted { opacity: .7; }
-        .flash { background: #163d2f; border: 1px solid #2f855a; padding: .75rem 1rem; border-radius: .75rem; margin-bottom: 1rem; }
-    </style>
 </head>
 <body>
-    <div class="container">
-        <header class="nav">
-            <div class="brand">{{ config('app.name') }}</div>
-            <nav>
-                <a href="{{ url('/') }}">Home</a>
-                <a href="{{ route('shop.index') }}">Shop</a>
-                <a href="{{ route('shop.cart') }}">Cart</a>
-                <a href="{{ url('/admin/core') }}">Admin</a>
-            </nav>
-        </header>
-        @if(session('success'))
-            <div class="flash">{{ session('success') }}</div>
-        @endif
-        @yield('content')
+    <div class="koro-shell">
+        <div class="koro-container">
+            <header class="koro-nav animate-fade-in">
+                <a href="{{ url('/') }}" class="koro-brand">
+                    Koro<span>.</span>
+                </a>
+                <nav class="koro-nav-links" aria-label="Main">
+                    <a href="{{ url('/') }}" @class(['koro-nav-link', 'is-active' => request()->is('/')])>Home</a>
+                    <a href="{{ route('shop.index') }}" @class(['koro-nav-link', 'is-active' => request()->is('shop*')])>Shop</a>
+                    <a href="{{ route('shop.cart') }}" @class(['koro-nav-link', 'is-active' => request()->routeIs('shop.cart')])>Cart</a>
+                    <a href="{{ route('cms.page', 'about') }}" @class(['koro-nav-link', 'is-active' => request()->is('pages/*')])>About</a>
+                    <a href="{{ url('/admin/core') }}" class="koro-btn koro-btn-sm ml-1 hidden sm:inline-flex">Admin</a>
+                </nav>
+            </header>
+
+            @if(session('success'))
+                <div class="koro-flash" role="status">{{ session('success') }}</div>
+            @endif
+
+            <main>
+                @yield('content')
+            </main>
+
+            <footer class="koro-footer">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <p>&copy; {{ date('Y') }} {{ config('app.name') }}. Modular Laravel showcase.</p>
+                    <div class="flex flex-wrap gap-4">
+                        <a href="{{ url('/admin/core') }}" class="transition hover:text-koro-copper">Core</a>
+                        <a href="{{ url('/admin/payments') }}" class="transition hover:text-koro-copper">Payments</a>
+                        <a href="{{ url('/admin/ecommerce') }}" class="transition hover:text-koro-copper">Ecommerce</a>
+                        <a href="{{ url('/admin/crm') }}" class="transition hover:text-koro-copper">CRM</a>
+                        <a href="{{ url('/admin/cms') }}" class="transition hover:text-koro-copper">CMS</a>
+                        <a href="{{ url('/admin/erp') }}" class="transition hover:text-koro-copper">ERP</a>
+                        <a href="{{ url('/api/v1/products') }}" class="transition hover:text-koro-copper">API</a>
+                    </div>
+                </div>
+            </footer>
+        </div>
     </div>
 </body>
 </html>

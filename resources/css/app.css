@@ -1,3 +1,156 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply font-sans antialiased bg-koro-ink text-koro-snow;
+        background-image: theme('backgroundImage.koro-mesh'), theme('backgroundImage.koro-grid');
+        background-size: auto, theme('backgroundSize.grid');
+    }
+
+    ::selection {
+        @apply bg-koro-copper/30 text-white;
+    }
+}
+
+@layer components {
+    .koro-shell {
+        @apply relative min-h-screen;
+    }
+
+    .koro-shell::before {
+        content: '';
+        @apply pointer-events-none fixed inset-0 opacity-[0.015];
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    .koro-container {
+        @apply relative mx-auto max-w-6xl px-5 sm:px-6 lg:px-8;
+    }
+
+    .koro-nav {
+        @apply flex items-center justify-between py-5 sm:py-6;
+    }
+
+    .koro-brand {
+        @apply font-display text-xl font-bold tracking-tight text-white;
+    }
+
+    .koro-brand span {
+        @apply text-koro-copper;
+    }
+
+    .koro-nav-links {
+        @apply flex items-center gap-1 sm:gap-2;
+    }
+
+    .koro-nav-link {
+        @apply rounded-lg px-3 py-2 text-sm font-medium text-koro-mist transition hover:bg-white/5 hover:text-white;
+    }
+
+    .koro-nav-link.is-active {
+        @apply bg-white/5 text-white;
+    }
+
+    .koro-btn {
+        @apply inline-flex items-center justify-center gap-2 rounded-xl bg-koro-copper px-5 py-2.5 text-sm font-semibold text-koro-ink shadow-lg shadow-koro-copper/20 transition hover:bg-koro-copper-dark hover:shadow-koro-copper/30 focus:outline-none focus:ring-2 focus:ring-koro-copper/50;
+    }
+
+    .koro-btn-secondary {
+        @apply bg-transparent text-koro-snow shadow-none ring-1 ring-white/15 hover:bg-white/5 hover:ring-white/25;
+    }
+
+    .koro-btn-sm {
+        @apply px-3.5 py-2 text-xs;
+    }
+
+    .koro-card {
+        @apply rounded-2xl border border-koro-border bg-koro-panel/80 p-5 backdrop-blur-sm transition hover:border-koro-copper/25 hover:bg-koro-panel;
+    }
+
+    .koro-card-interactive {
+        @apply koro-card block no-underline text-inherit hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/20;
+    }
+
+    .koro-eyebrow {
+        @apply text-xs font-semibold uppercase tracking-[0.2em] text-koro-teal;
+    }
+
+    .koro-heading-xl {
+        @apply font-display text-4xl font-bold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl;
+    }
+
+    .koro-heading-lg {
+        @apply font-display text-2xl font-bold tracking-tight text-white sm:text-3xl;
+    }
+
+    .koro-lead {
+        @apply max-w-2xl text-base leading-relaxed text-koro-mist sm:text-lg;
+    }
+
+    .koro-muted {
+        @apply text-koro-mist;
+    }
+
+    .koro-flash {
+        @apply mb-6 rounded-xl border border-emerald-500/30 bg-emerald-950/40 px-4 py-3 text-sm text-emerald-200;
+    }
+
+    .koro-badge {
+        @apply inline-flex items-center rounded-full bg-koro-copper/15 px-2.5 py-0.5 text-xs font-medium text-koro-copper;
+    }
+
+    .koro-module-icon {
+        @apply mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-koro-copper/10 text-lg text-koro-copper;
+    }
+
+    .koro-price {
+        @apply font-display text-xl font-bold text-koro-copper;
+    }
+
+    .koro-divider {
+        @apply my-8 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent;
+    }
+
+    .koro-footer {
+        @apply mt-16 border-t border-koro-border py-8 text-sm text-koro-mist;
+    }
+
+    .koro-prose {
+        @apply leading-relaxed text-koro-mist [&_a]:text-koro-teal [&_a]:underline [&_h2]:mb-3 [&_h2]:mt-6 [&_h2]:font-display [&_h2]:text-xl [&_h2]:text-white [&_p]:mb-4;
+    }
+
+    .koro-stagger > * {
+        @apply animate-fade-up;
+    }
+
+    .koro-stagger > *:nth-child(1) { animation-delay: 0ms; }
+    .koro-stagger > *:nth-child(2) { animation-delay: 80ms; }
+    .koro-stagger > *:nth-child(3) { animation-delay: 160ms; }
+    .koro-stagger > *:nth-child(4) { animation-delay: 240ms; }
+    .koro-stagger > *:nth-child(5) { animation-delay: 320ms; }
+    .koro-stagger > *:nth-child(6) { animation-delay: 400ms; }
+    .koro-stagger > *:nth-child(7) { animation-delay: 480ms; }
+    .koro-stagger > *:nth-child(8) { animation-delay: 560ms; }
+
+    .koro-product-grid {
+        @apply grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
+    }
+
+    .koro-cart-row {
+        @apply koro-card flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between;
+    }
+
+    .koro-breadcrumb {
+        @apply mb-6 flex items-center gap-2 text-sm text-koro-mist;
+    }
+
+    .koro-breadcrumb a {
+        @apply transition hover:text-koro-copper;
+    }
+}
