@@ -9,5 +9,6 @@ Route::prefix('shop')->name('shop.')->group(function () {
     Route::get('/products/{product:slug}', [ShopController::class, 'show'])->name('show');
     Route::get('/cart', [CartController::class, 'show'])->name('cart');
     Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
+    Route::delete('/cart/items/{item}', [CartController::class, 'remove'])->name('cart.remove');
     Route::post('/checkout', [CartController::class, 'checkout'])->name('checkout');
 });
