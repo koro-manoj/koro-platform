@@ -3,15 +3,19 @@
 namespace Modules\Erp\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Modules\Erp\Listeners\FulfillPaidInvoice;
+use Modules\Payments\Events\InvoicePaid;
 
 class EventServiceProvider extends ServiceProvider
 {
     /**
-     * The event handler mappings for the application.
-     *
      * @var array<string, array<int, string>>
      */
-    protected $listen = [];
+    protected $listen = [
+        InvoicePaid::class => [
+            FulfillPaidInvoice::class,
+        ],
+    ];
 
     /**
      * Indicates if events should be discovered.

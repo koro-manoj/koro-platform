@@ -36,5 +36,24 @@ class CheckoutFlowTest extends TestCase
             'customer_email' => 'buyer@example.com',
             'status' => 'paid',
         ]);
+
+        $invoice = \Modules\Payments\Models\Invoice::query()
+            ->where('customer_email', 'buyer@example.com')
+            ->firstOrFail();
+
+        $this->assertDatabaseHas('erp_orders', [
+            'invoice_id' => $invoice->id,
+            'status' => 'pending',
+        ]);
+
+        $this->assertDatabaseHas('products', [
+            'slug' => 'starter-kit',
+            'stock' => 24,
+        ]);
+
+        $this->assertDatabaseHas('inventory_items', [
+            'sku' => 'KORO-001',
+            'quantity_on_hand' => 24,
+        ]);
     }
 }

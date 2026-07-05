@@ -36,6 +36,7 @@ class OrderResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('order_number'),
+                Tables\Columns\TextColumn::make('invoice_id')->label('Invoice')->toggleable(),
                 Tables\Columns\TextColumn::make('status')->badge(),
                 Tables\Columns\TextColumn::make('total_cents')->money('USD', divideBy: 100),
             ])

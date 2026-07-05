@@ -8,7 +8,7 @@ class Order extends Model
 {
     protected $table = 'erp_orders';
 
-    protected $fillable = ['order_number', 'status', 'line_items', 'total_cents'];
+    protected $fillable = ['order_number', 'invoice_id', 'status', 'line_items', 'total_cents'];
 
     protected function casts(): array
     {

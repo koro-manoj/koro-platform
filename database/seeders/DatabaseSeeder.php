@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             \Modules\Core\Database\Seeders\CoreDatabaseSeeder::class,
             \Modules\Ecommerce\Database\Seeders\EcommerceDatabaseSeeder::class,
+            \Modules\Erp\Database\Seeders\ErpDatabaseSeeder::class,
         ]);
 
         Page::query()->updateOrCreate(
@@ -79,13 +80,13 @@ class DatabaseSeeder extends Seeder
         );
 
         InventoryItem::query()->firstOrCreate(
-            ['sku' => 'WH-001'],
-            ['name' => 'Warehouse stock', 'quantity_on_hand' => 120, 'reorder_level' => 20, 'location' => 'A-12']
+            ['sku' => 'KORO-001'],
+            ['name' => 'Starter Kit', 'quantity_on_hand' => 25, 'reorder_level' => 5, 'location' => 'MAIN']
         );
 
         Order::query()->firstOrCreate(
             ['order_number' => 'ERP-1001'],
-            ['status' => 'pending', 'total_cents' => 4900, 'line_items' => [['sku' => 'DEMO-001', 'qty' => 1]]]
+            ['status' => 'fulfilled', 'total_cents' => 4900, 'line_items' => [['sku' => 'KORO-001', 'qty' => 1]]]
         );
     }
 }

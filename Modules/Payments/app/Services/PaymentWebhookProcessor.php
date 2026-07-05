@@ -2,6 +2,7 @@
 
 namespace Modules\Payments\Services;
 
+use Modules\Payments\Events\InvoicePaid;
 use Modules\Payments\Models\Invoice;
 use Modules\Payments\Models\Payment;
 use Modules\Payments\Models\PaymentWebhook;
@@ -51,15 +52,25 @@ class PaymentWebhookProcessor
             'paid_at' => now(),
         ]);
 
-        $payment->invoice?->update([
-            'status' => 'paid',
-            'paid_at' => now(),
-            'gateway_reference' => $sessionId,
-        ]);
+        $invoice = $payment->invoice;
+
+        if ($invoice !== null && $invoice->status !== 'paid') {
+            $invoice->update([
+                'status' => 'paid',
+                'paid_at' => now(),
+                'gateway_reference' => $sessionId,
+            ]);
+
+            InvoicePaid::dispatch($invoice->fresh());
+        }
     }
 
     public function markInvoicePaidFromSession(Invoice $invoice, Payment $payment): void
     {
+        if ($invoice->status === 'paid') {
+            return;
+        }
+
         $payment->update([
             'status' => 'succeeded',
             'paid_at' => now(),
@@ -70,5 +81,7 @@ class PaymentWebhookProcessor
             'paid_at' => now(),
             'gateway_reference' => $payment->stripe_checkout_session_id,
         ]);
+
+        InvoicePaid::dispatch($invoice->fresh());
     }
 }

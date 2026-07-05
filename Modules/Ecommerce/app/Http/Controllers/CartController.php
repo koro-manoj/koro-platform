@@ -87,6 +87,7 @@ class CartController extends Controller
 
         $lineItems = $cart->items->map(fn (CartItem $item): array => [
             'product_id' => $item->product_id,
+            'sku' => $item->product->sku,
             'name' => $item->product->name,
             'quantity' => $item->quantity,
             'unit_price_cents' => $item->unit_price_cents,
