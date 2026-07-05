@@ -1,0 +1,74 @@
+<?php
+
+namespace Modules\Payments\Services;
+
+use Modules\Payments\Models\Invoice;
+use Modules\Payments\Models\Payment;
+use Modules\Payments\Models\PaymentWebhook;
+
+class PaymentWebhookProcessor
+{
+    public function process(PaymentWebhook $webhook): void
+    {
+        if ($webhook->processed_at !== null) {
+            return;
+        }
+
+        $payload = $webhook->payload;
+        $type = $webhook->event_type;
+
+        if ($type === 'checkout.session.completed') {
+            $this->handleCheckoutCompleted($payload);
+        }
+
+        $webhook->update([
+            'status' => 'processed',
+            'processed_at' => now(),
+        ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    private function handleCheckoutCompleted(array $payload): void
+    {
+        $sessionId = $payload['data']['object']['id'] ?? $payload['id'] ?? null;
+
+        if (! is_string($sessionId)) {
+            return;
+        }
+
+        $payment = Payment::query()
+            ->where('stripe_checkout_session_id', $sessionId)
+            ->first();
+
+        if ($payment === null) {
+            return;
+        }
+
+        $payment->update([
+            'status' => 'succeeded',
+            'paid_at' => now(),
+        ]);
+
+        $payment->invoice?->update([
+            'status' => 'paid',
+            'paid_at' => now(),
+            'gateway_reference' => $sessionId,
+        ]);
+    }
+
+    public function markInvoicePaidFromSession(Invoice $invoice, Payment $payment): void
+    {
+        $payment->update([
+            'status' => 'succeeded',
+            'paid_at' => now(),
+        ]);
+
+        $invoice->update([
+            'status' => 'paid',
+            'paid_at' => now(),
+            'gateway_reference' => $payment->stripe_checkout_session_id,
+        ]);
+    }
+}

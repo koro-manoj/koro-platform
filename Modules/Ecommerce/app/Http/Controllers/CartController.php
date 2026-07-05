@@ -6,20 +6,41 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 use Modules\Ecommerce\Models\Cart;
 use Modules\Ecommerce\Models\CartItem;
 use Modules\Ecommerce\Models\Product;
 use Modules\Payments\Models\Invoice;
-use Modules\Payments\Services\PaymentGatewayManager;
+use Modules\Payments\Models\Payment;
+use Modules\Payments\Services\PaymentWebhookProcessor;
+use Modules\Payments\Services\StripeCheckoutService;
 
 class CartController extends Controller
 {
-    public function show(Request $request)
+    public function show(Request $request): View
     {
         $cart = $this->resolveCart($request);
         $cart->load('items.product');
 
         return view('ecommerce::shop.cart', compact('cart'));
+    }
+
+    public function checkoutForm(Request $request): View|RedirectResponse
+    {
+        $cart = $this->resolveCart($request);
+        $cart->load('items.product');
+
+        if ($cart->items->isEmpty()) {
+            return redirect()->route('shop.cart')->with('error', 'Your cart is empty.');
+        }
+
+        $user = $request->user();
+
+        return view('ecommerce::shop.checkout', [
+            'cart' => $cart,
+            'customerName' => old('customer_name', $user?->name),
+            'customerEmail' => old('customer_email', $user?->email),
+        ]);
     }
 
     public function add(Request $request, Product $product): RedirectResponse
@@ -48,18 +69,21 @@ class CartController extends Controller
         return back()->with('success', 'Item removed.');
     }
 
-    public function checkout(Request $request, PaymentGatewayManager $payments): RedirectResponse
+    public function checkout(Request $request, StripeCheckoutService $checkout): RedirectResponse
     {
+        $validated = $request->validate([
+            'customer_name' => ['required', 'string', 'max:120'],
+            'customer_email' => ['required', 'email', 'max:255'],
+        ]);
+
         $cart = $this->resolveCart($request);
         $cart->load('items.product');
 
         if ($cart->items->isEmpty()) {
-            return back()->with('error', 'Your cart is empty.');
+            return redirect()->route('shop.cart')->with('error', 'Your cart is empty.');
         }
 
-        $amountCents = $cart->items->sum(
-            fn (CartItem $item): int => $item->quantity * $item->unit_price_cents
-        );
+        $amountCents = $cart->subtotalCents();
 
         $lineItems = $cart->items->map(fn (CartItem $item): array => [
             'product_id' => $item->product_id,
@@ -68,13 +92,12 @@ class CartController extends Controller
             'unit_price_cents' => $item->unit_price_cents,
         ])->values()->all();
 
-        $user = $request->user();
-
         $invoice = Invoice::query()->create([
             'number' => 'INV-'.Str::upper(Str::random(8)),
-            'user_id' => $user?->id,
-            'customer_email' => $user?->email ?? 'guest@koro.test',
-            'customer_name' => $user?->name ?? 'Guest',
+            'user_id' => $request->user()?->id,
+            'cart_id' => $cart->id,
+            'customer_email' => $validated['customer_email'],
+            'customer_name' => $validated['customer_name'],
             'amount_cents' => $amountCents,
             'currency' => 'USD',
             'status' => 'pending',
@@ -82,26 +105,101 @@ class CartController extends Controller
             'line_items' => $lineItems,
         ]);
 
-        $result = $payments->charge($invoice, 'stripe');
+        $payment = $checkout->startCheckout(
+            $invoice,
+            route('shop.checkout.success', ['invoice' => $invoice->number]),
+            route('shop.checkout.cancel', ['invoice' => $invoice->number]),
+        );
 
-        $invoice->update([
-            'status' => 'paid',
-            'gateway_reference' => $result['reference'] ?? null,
-            'paid_at' => now(),
+        $url = $checkout->checkoutUrl($payment);
+
+        if ($url === null) {
+            return back()->with('error', 'Unable to start checkout. Configure Stripe in Core → Integrations.');
+        }
+
+        return redirect($url);
+    }
+
+    public function success(
+        Request $request,
+        Invoice $invoice,
+        StripeCheckoutService $checkout,
+        PaymentWebhookProcessor $processor,
+    ): View {
+        $sessionId = $request->string('session_id')->toString();
+        $isSandbox = $request->boolean('sandbox');
+
+        $payment = Payment::query()
+            ->where('invoice_id', $invoice->id)
+            ->latest()
+            ->first();
+
+        if ($payment && $invoice->status !== 'paid') {
+            if ($isSandbox) {
+                $processor->markInvoicePaidFromSession($invoice, $payment);
+            } elseif ($sessionId !== '') {
+                try {
+                    $session = $checkout->retrieveSession($sessionId);
+                    if ($session->payment_status === 'paid') {
+                        $processor->markInvoicePaidFromSession($invoice, $payment);
+                    }
+                } catch (\Throwable) {
+                    // Webhook will finalize if session retrieval fails.
+                }
+            }
+        }
+
+        $this->finalizeCart($invoice);
+
+        return view('ecommerce::shop.checkout-success', [
+            'invoice' => $invoice->fresh(),
+            'sandbox' => $isSandbox,
         ]);
+    }
 
-        $cart->update(['status' => 'checked_out']);
-
-        return redirect()
-            ->route('shop.index')
-            ->with('success', 'Payment complete. Invoice '.$invoice->number);
+    public function cancel(Invoice $invoice): View
+    {
+        return view('ecommerce::shop.checkout-cancel', compact('invoice'));
     }
 
     protected function resolveCart(Request $request): Cart
     {
-        return Cart::query()->firstOrCreate(
-            ['session_id' => $request->session()->getId(), 'status' => 'open'],
+        $session = $request->session();
+
+        if ($session->has('cart_id')) {
+            $cart = Cart::query()
+                ->where('id', $session->get('cart_id'))
+                ->where('status', 'open')
+                ->first();
+
+            if ($cart !== null) {
+                return $cart;
+            }
+        }
+
+        $cart = Cart::query()->firstOrCreate(
+            ['session_id' => $session->getId(), 'status' => 'open'],
             ['user_id' => $request->user()?->id]
         );
+
+        $session->put('cart_id', $cart->id);
+
+        return $cart;
+    }
+
+    protected function finalizeCart(Invoice $invoice): void
+    {
+        if ($invoice->status !== 'paid' || $invoice->cart_id === null) {
+            return;
+        }
+
+        $cart = Cart::query()->find($invoice->cart_id);
+
+        if ($cart === null) {
+            return;
+        }
+
+        $cart->items()->delete();
+        $cart->update(['status' => 'checked_out']);
     }
 }

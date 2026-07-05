@@ -3,14 +3,21 @@
 namespace Modules\Core\Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Modules\Core\Services\IntegrationService;
 
 class CoreDatabaseSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // $this->call([]);
+        app(IntegrationService::class)->store(
+            'stripe',
+            'Stripe Sandbox',
+            [
+                'publishable_key' => 'pk_test_replace_me',
+                'secret_key' => 'sk_test_replace_me',
+                'webhook_secret' => 'whsec_replace_me',
+            ],
+            ['mode' => 'sandbox'],
+        );
     }
 }

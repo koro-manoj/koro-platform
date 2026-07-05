@@ -27,7 +27,11 @@ class ProductResource extends Resource
                 ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
             Forms\Components\TextInput::make('slug')->required(),
             Forms\Components\Textarea::make('description')->columnSpanFull(),
+            Forms\Components\TextInput::make('image_url')->url()->maxLength(500)->columnSpanFull(),
+            Forms\Components\TextInput::make('category')->maxLength(80),
+            Forms\Components\TextInput::make('badge')->maxLength(40),
             Forms\Components\TextInput::make('price_cents')->numeric()->required(),
+            Forms\Components\TextInput::make('compare_at_price_cents')->numeric(),
             Forms\Components\TextInput::make('currency')->default('USD')->maxLength(3),
             Forms\Components\TextInput::make('stock')->numeric()->default(0),
             Forms\Components\Toggle::make('is_active')->default(true),
@@ -38,8 +42,11 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('image_url')->label('Image')->square(),
                 Tables\Columns\TextColumn::make('sku'),
                 Tables\Columns\TextColumn::make('name')->searchable(),
+                Tables\Columns\TextColumn::make('category')->toggleable(),
+                Tables\Columns\TextColumn::make('badge')->toggleable(),
                 Tables\Columns\TextColumn::make('price_cents')->money(fn ($record) => $record->currency, divideBy: 100),
                 Tables\Columns\TextColumn::make('stock'),
                 Tables\Columns\IconColumn::make('is_active')->boolean(),

@@ -11,7 +11,6 @@ use Modules\Crm\Models\Contact;
 use Modules\Crm\Models\Lead;
 use Modules\Crm\Models\Pipeline;
 use Modules\Crm\Models\PipelineStage;
-use Modules\Ecommerce\Models\Product;
 use Modules\Erp\Models\InventoryItem;
 use Modules\Erp\Models\Order;
 use Modules\Payments\Models\Invoice;
@@ -29,31 +28,10 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        Product::query()->updateOrCreate(
-            ['sku' => 'DEMO-001'],
-            [
-                'name' => 'Starter Kit',
-                'slug' => 'starter-kit',
-                'description' => 'Demo product for the Koro storefront.',
-                'price_cents' => 4900,
-                'currency' => 'USD',
-                'stock' => 25,
-                'is_active' => true,
-            ]
-        );
-
-        Product::query()->updateOrCreate(
-            ['sku' => 'DEMO-002'],
-            [
-                'name' => 'Pro Bundle',
-                'slug' => 'pro-bundle',
-                'description' => 'Second demo product with higher price point.',
-                'price_cents' => 12900,
-                'currency' => 'USD',
-                'stock' => 10,
-                'is_active' => true,
-            ]
-        );
+        $this->call([
+            \Modules\Core\Database\Seeders\CoreDatabaseSeeder::class,
+            \Modules\Ecommerce\Database\Seeders\EcommerceDatabaseSeeder::class,
+        ]);
 
         Page::query()->updateOrCreate(
             ['slug' => 'about'],

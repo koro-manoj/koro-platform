@@ -29,6 +29,14 @@
                 <div class="koro-flash" role="status">{{ session('success') }}</div>
             @endif
 
+            @if(session('error'))
+                <div class="koro-flash koro-flash-error" role="alert">{{ session('error') }}</div>
+            @endif
+
+            @if($errors->any())
+                <div class="koro-flash koro-flash-error" role="alert">{{ $errors->first() }}</div>
+            @endif
+
             <main>
                 @yield('content')
             </main>
