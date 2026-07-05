@@ -22,11 +22,22 @@
         @endif
 
         <div class="mt-8 flex flex-col gap-4 border-t border-koro-border pt-6 sm:flex-row sm:items-center sm:justify-between">
-            <span class="koro-price text-3xl">${{ number_format($product->price(), 2) }}</span>
-            <form method="POST" action="{{ route('shop.cart.add', $product) }}">
-                @csrf
-                <button class="koro-btn" type="submit">Add to cart</button>
-            </form>
+            <div>
+                <span class="koro-price text-3xl">${{ number_format($product->price(), 2) }}</span>
+                @if($product->inStock())
+                    <p class="koro-muted mt-2 text-sm">{{ $product->stock }} in stock</p>
+                @else
+                    <p class="mt-2 text-sm font-medium text-red-400">Out of stock</p>
+                @endif
+            </div>
+            @if($product->inStock())
+                <form method="POST" action="{{ route('shop.cart.add', $product) }}">
+                    @csrf
+                    <button class="koro-btn" type="submit">Add to cart</button>
+                </form>
+            @else
+                <span class="koro-btn cursor-not-allowed opacity-50">Unavailable</span>
+            @endif
         </div>
     </article>
 @endsection

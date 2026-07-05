@@ -34,10 +34,14 @@
                     <span class="koro-price">${{ number_format($product->price(), 2) }}</span>
                     <div class="flex gap-2">
                         <a class="koro-btn koro-btn-secondary koro-btn-sm" href="{{ route('shop.show', $product) }}">View</a>
-                        <form method="POST" action="{{ route('shop.cart.add', $product) }}">
-                            @csrf
-                            <button class="koro-btn koro-btn-sm" type="submit">Add</button>
-                        </form>
+                        @if($product->inStock())
+                            <form method="POST" action="{{ route('shop.cart.add', $product) }}">
+                                @csrf
+                                <button class="koro-btn koro-btn-sm" type="submit">Add</button>
+                            </form>
+                        @else
+                            <span class="koro-btn koro-btn-sm cursor-not-allowed opacity-50">Out of stock</span>
+                        @endif
                     </div>
                 </div>
             </article>

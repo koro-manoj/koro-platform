@@ -25,8 +25,10 @@ class CrmPanelProvider extends PanelProvider
             ->id('crm')
             ->path('admin/crm')
             ->login()
+            ->brandName('Koro CRM')
             ->colors(['primary' => Color::Sky])
             ->discoverResources(in: module_path('Crm', 'app/Filament/Resources'), for: 'Modules\\Crm\\Filament\\Resources')
+            ->discoverWidgets(in: module_path('Crm', 'app/Filament/Widgets'), for: 'Modules\\Crm\\Filament\\Widgets')
             ->pages([Pages\Dashboard::class])
             ->middleware([
                 EncryptCookies::class,

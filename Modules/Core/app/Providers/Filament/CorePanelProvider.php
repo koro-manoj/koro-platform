@@ -25,8 +25,10 @@ class CorePanelProvider extends PanelProvider
             ->id('core')
             ->path('admin/core')
             ->login()
+            ->brandName('Koro Core')
             ->colors(['primary' => Color::Slate])
             ->discoverResources(in: module_path('Core', 'app/Filament/Resources'), for: 'Modules\\Core\\Filament\\Resources')
+            ->discoverWidgets(in: module_path('Core', 'app/Filament/Widgets'), for: 'Modules\\Core\\Filament\\Widgets')
             ->pages([Pages\Dashboard::class])
             ->middleware([
                 EncryptCookies::class,

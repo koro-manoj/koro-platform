@@ -25,8 +25,10 @@ class ErpPanelProvider extends PanelProvider
             ->id('erp')
             ->path('admin/erp')
             ->login()
+            ->brandName('Koro ERP')
             ->colors(['primary' => Color::Orange])
             ->discoverResources(in: module_path('Erp', 'app/Filament/Resources'), for: 'Modules\\Erp\\Filament\\Resources')
+            ->discoverWidgets(in: module_path('Erp', 'app/Filament/Widgets'), for: 'Modules\\Erp\\Filament\\Widgets')
             ->pages([Pages\Dashboard::class])
             ->middleware([
                 EncryptCookies::class,

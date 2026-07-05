@@ -38,4 +38,14 @@ class Product extends Model
     {
         return $this->price_cents / 100;
     }
+
+    public function inStock(): bool
+    {
+        return $this->is_active && $this->stock > 0;
+    }
+
+    public function availableFor(int $requestedQuantity): bool
+    {
+        return $this->inStock() && $requestedQuantity <= $this->stock;
+    }
 }

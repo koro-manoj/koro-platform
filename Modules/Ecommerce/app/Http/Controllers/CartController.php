@@ -34,6 +34,19 @@ class CartController extends Controller
             return redirect()->route('shop.cart')->with('error', 'Your cart is empty.');
         }
 
+        foreach ($cart->items as $item) {
+            $product = $item->product->fresh();
+
+            if (! $product->availableFor($item->quantity)) {
+                return redirect()->route('shop.cart')->with(
+                    'error',
+                    $product->inStock()
+                        ? "{$product->name} only has {$product->stock} left in stock."
+                        : "{$product->name} is out of stock."
+                );
+            }
+        }
+
         $user = $request->user();
 
         return view('ecommerce::shop.checkout', [
@@ -45,13 +58,23 @@ class CartController extends Controller
 
     public function add(Request $request, Product $product): RedirectResponse
     {
+        if (! $product->inStock()) {
+            return back()->with('error', 'This item is out of stock.');
+        }
+
         $cart = $this->resolveCart($request);
         $item = CartItem::query()->firstOrNew([
             'cart_id' => $cart->id,
             'product_id' => $product->id,
         ]);
 
-        $item->quantity = ($item->exists ? $item->quantity : 0) + 1;
+        $nextQuantity = ($item->exists ? $item->quantity : 0) + 1;
+
+        if (! $product->fresh()->availableFor($nextQuantity)) {
+            return back()->with('error', 'Not enough stock available for this item.');
+        }
+
+        $item->quantity = $nextQuantity;
         $item->unit_price_cents = $product->price_cents;
         $item->save();
 
@@ -81,6 +104,19 @@ class CartController extends Controller
 
         if ($cart->items->isEmpty()) {
             return redirect()->route('shop.cart')->with('error', 'Your cart is empty.');
+        }
+
+        foreach ($cart->items as $item) {
+            $product = $item->product->fresh();
+
+            if (! $product->availableFor($item->quantity)) {
+                return back()->with(
+                    'error',
+                    $product->inStock()
+                        ? "{$product->name} only has {$product->stock} left in stock."
+                        : "{$product->name} is out of stock."
+                );
+            }
         }
 
         $amountCents = $cart->subtotalCents();

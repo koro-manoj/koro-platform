@@ -2,6 +2,7 @@
 
 namespace Modules\Payments\Services;
 
+use Illuminate\Support\Facades\Log;
 use Modules\Payments\Events\InvoicePaid;
 use Modules\Payments\Models\Invoice;
 use Modules\Payments\Models\Payment;
@@ -36,6 +37,10 @@ class PaymentWebhookProcessor
         $sessionId = $payload['data']['object']['id'] ?? $payload['id'] ?? null;
 
         if (! is_string($sessionId)) {
+            Log::warning('payments.webhook.checkout_completed_missing_session_id', [
+                'webhook_type' => 'checkout.session.completed',
+            ]);
+
             return;
         }
 
@@ -44,6 +49,10 @@ class PaymentWebhookProcessor
             ->first();
 
         if ($payment === null) {
+            Log::warning('payments.webhook.payment_not_found', [
+                'session_id' => $sessionId,
+            ]);
+
             return;
         }
 
